@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Integrations Pill Marquee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pill-bg: #f3f3f3;
+    --pill-bg-hover: #ededed;
+    --ink: #2c2c2c;
+    --label: #3a3a3a;
+    --page: #ffffff;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{ margin:0; padding:0; }
+
+  body{
+    background: var(--page);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .marquee-section{
+    width: 100%;
+    padding: 48px 0;
+    position: relative;
+  }
+
+  /* soft warm glow behind the middle of the marquee, like the reference */
+  .marquee-section::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width: min(760px, 90vw);
+    height: 460px;
+    transform: translate(-50%,-50%);
+    background:
+      radial-gradient(closest-side, rgba(255,214,232,.55), rgba(255,214,232,0) 70%),
+      radial-gradient(closest-side, rgba(255,241,196,.55), rgba(255,241,196,0) 72%);
+    background-position: 42% 50%, 60% 50%;
+    background-size: 70% 100%, 70% 100%;
+    background-repeat: no-repeat;
+    filter: blur(28px);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .rows{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .marquee{
+    overflow: hidden;
+    width: 100%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+  }
+
+  .track{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: max-content;
+    will-change: transform;
+    animation: scroll-left var(--dur, 42s) linear infinite;
+  }
+  .track.reverse{ animation-name: scroll-right; }
+
+  .marquee:hover .track{ animation-play-state: paused; }
+
+  @keyframes scroll-left{
+    from{ transform: translate3d(0,0,0); }
+    to{ transform: translate3d(-50%,0,0); }
+  }
+  @keyframes scroll-right{
+    from{ transform: translate3d(-50%,0,0); }
+    to{ transform: translate3d(0,0,0); }
+  }
+
+  .pill{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    padding: 20px 26px;
+    min-width: 240px;
+    border-radius: 22px;
+    background: var(--pill-bg);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 2px rgba(23,23,23,.04),
+      0 6px 18px -10px rgba(23,23,23,.10);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), background .3s ease, box-shadow .35s ease;
+    cursor: default;
+    user-select: none;
+  }
+  .pill:hover{
+    background: var(--pill-bg-hover);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 2px 4px rgba(23,23,23,.05),
+      0 14px 30px -14px rgba(23,23,23,.20);
+  }
+
+  .pill .label{
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--label);
+    white-space: nowrap;
+    margin-right: auto;
+  }
+
+  .pill .icon{
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+  }
+  .pill .icon svg{ width: 100%; height: 100%; display:block; }
+
+  /* stagger rows a bit so pills never line up in a grid */
+  .row-2 .track{ padding-left: 90px; }
+  .row-3 .track{ padding-left: 40px; }
+
+  @media (max-width: 768px){
+    .pill{
+      min-width: 176px;
+      gap: 20px;
+      padding: 15px 18px;
+      border-radius: 18px;
+    }
+    .pill .label{ font-size: 15px; }
+    .pill .icon{ width: 28px; height: 28px; }
+    .rows{ gap: 12px; }
+    .track{ gap: 12px; }
+    .marquee-section::before{ height: 320px; filter: blur(22px); }
+    .row-2 .track{ padding-left: 46px; }
+    .row-3 .track{ padding-left: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .track{ animation-duration: 160s; }
+  }
+
+  /* ---- icon sprite is hidden, referenced via <use> ---- */
+  #sprite{ display:none; }
+</style>
+</head>
+<body>
+
+<!-- Icon sprite -->
+<svg id="sprite" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-star8" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M24 1.5l4.3 10.1L38 7.3l-4.3 9.7 10.2-4.3-7.6 7.6 11 3.7-11 3.7 7.6 7.6-10.2-4.3L38 40.7l-9.7-4.3L24 46.5l-4.3-10.1-9.7 4.3 4.3-9.7L4.1 35.3l7.6-7.6L.7 24l11-3.7-7.6-7.6 10.2 4.3-4.3-9.7 9.7 4.3L24 1.5z"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 48 48">
+    <g fill="currentColor">
+      <circle cx="24" cy="18" r="7"/>
+      <path d="M24 0l1.7 8h-3.4L24 0zM10.3 3.4l4.7 6.8-2.9 1.7-1.8-8.5zM37.7 3.4l-1.8 8.5-2.9-1.7 4.7-6.8zM1 13.3l7.4 4-1.7 2.9L1 13.3zM47 13.3l-5.7 6.9-1.7-2.9 7.4-4z"/>
+      <path d="M4 28.5c4.6-2.6 12-4.2 20-4.2s15.4 1.6 20 4.2v3.6C39.4 29.6 32 28 24 28S8.6 29.6 4 32.1v-3.6zM6 36.4C10.4 34 17 32.6 24 32.6s13.6 1.4 18 3.8V40c-4.4-2.4-11-3.8-18-3.8S10.4 37.6 6 40v-3.6zM9 44c3.8-2 9.2-3.2 15-3.2S35.2 42 39 44v3.4c-3.8-2-9.2-3.2-15-3.2S12.8 45.4 9 47.4V44z"/>
+    </g>
+  </symbol>
+  <symbol id="i-s" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M24 1a23 23 0 100 46 23 23 0 000-46zm10.8 12.6H23.4c-2.6 0-4 1-4 2.6 0 1.5 1.2 2.4 3.8 2.9l4.6.9c5 1 7.6 3.5 7.6 7.6 0 5.4-4.2 8.9-11.2 8.9h-11v-6.2h11.6c2.8 0 4.2-1 4.2-2.7 0-1.5-1.1-2.4-3.7-2.9l-4.6-.9c-5.1-1-7.7-3.6-7.7-7.7 0-5.3 4.2-8.7 11.1-8.7h10.4v6.2z"/>
+  </symbol>
+  <symbol id="i-diamond" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M24 0l24 24-24 24L0 24 24 0zm0 7.5L7.5 24 24 40.5 40.5 24 24 7.5z"/>
+    <path fill="currentColor" d="M24 13l11 11-11 11-11-11 11-11zm0 6.6L19.6 24l4.4 4.4 4.4-4.4L24 19.6z"/>
+  </symbol>
+  <symbol id="i-blob" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M24 8c11 0 20 5.8 20 13 0 7.5-9 19-20 19S4 28.5 4 21C4 13.8 13 8 24 8z"/>
+    <circle cx="16.5" cy="19" r="4.5" fill="#f3f3f3"/>
+    <circle cx="31.5" cy="19" r="4.5" fill="#f3f3f3"/>
+  </symbol>
+  <symbol id="i-cube" viewBox="0 0 48 48">
+    <path fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" d="M9 14.5L24 6l15 8.5v19L24 42 9 33.5v-19z"/>
+    <path fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" d="M17 19.5l7-4 7 4v9l-7 4-7-4v-9z"/>
+  </symbol>
+  <symbol id="i-hexblob" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M34.5 4L44 13.5v9L27 5.5h-1.5L34.5 4zM13.5 44L4 34.5v-9L21 42.5h1.5L13.5 44z"/>
+    <path fill="currentColor" d="M13.5 4h21L44 13.5v21L34.5 44h-21L4 34.5v-21L13.5 4zm2 7L11 15.5v17L15.5 37h17l4.5-4.5v-17L32.5 11h-17z"/>
+    <path fill="currentColor" d="M22 16h9c-3 2-5 4-5 8s2 6 5 8h-9c-4 0-7-3.4-7-8s3-8 7-8z"/>
+  </symbol>
+  <symbol id="i-layers" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round">
+      <path d="M24 3l21 21-21 21L3 24 24 3z"/>
+      <path d="M24 11l13 13-13 13-13-13 13-13z"/>
+      <path d="M24 19l5 5-5 5-5-5 5-5z"/>
+    </g>
+  </symbol>
+  <symbol id="i-waves" viewBox="0 0 48 48">
+    <g fill="currentColor">
+      <rect x="2" y="20" width="3" height="8" rx="1.5"/>
+      <rect x="8" y="15" width="3" height="18" rx="1.5"/>
+      <rect x="14" y="9" width="3" height="30" rx="1.5"/>
+      <rect x="20" y="4" width="3" height="40" rx="1.5"/>
+      <rect x="26" y="9" width="3" height="30" rx="1.5"/>
+      <rect x="32" y="14" width="3" height="20" rx="1.5"/>
+      <rect x="38" y="18" width="3" height="12" rx="1.5"/>
+      <rect x="44" y="21" width="3" height="6" rx="1.5"/>
+    </g>
+  </symbol>
+  <symbol id="i-quad" viewBox="0 0 48 48">
+    <g fill="currentColor">
+      <circle cx="16" cy="13" r="9"/>
+      <circle cx="34" cy="13" r="9"/>
+      <circle cx="16" cy="34" r="9"/>
+      <path d="M25 34a9 9 0 1118 0v9h-9a9 9 0 01-9-9z"/>
+    </g>
+  </symbol>
+  <symbol id="i-n" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M6 6h11l14 20V6h11v36H31L17 22v20H6V6z"/>
+  </symbol>
+  <symbol id="i-flower" viewBox="0 0 48 48">
+    <g fill="currentColor">
+      <circle cx="24" cy="24" r="6"/>
+      <g>
+        <ellipse cx="24" cy="7" rx="3.4" ry="9"/>
+        <ellipse cx="24" cy="41" rx="3.4" ry="9"/>
+        <ellipse cx="7" cy="24" rx="9" ry="3.4"/>
+        <ellipse cx="41" cy="24" rx="9" ry="3.4"/>
+      </g>
+      <g transform="rotate(45 24 24)">
+        <ellipse cx="24" cy="7" rx="3.4" ry="9"/>
+        <ellipse cx="24" cy="41" rx="3.4" ry="9"/>
+        <ellipse cx="7" cy="24" rx="9" ry="3.4"/>
+        <ellipse cx="41" cy="24" rx="9" ry="3.4"/>
+      </g>
+    </g>
+  </symbol>
+  <symbol id="i-spiral" viewBox="0 0 48 48">
+    <path fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" d="M24 38a14 14 0 110-28 11 11 0 010 22 8 8 0 110-16 5.5 5.5 0 010 11 3 3 0 110-6"/>
+  </symbol>
+  <symbol id="i-bolt" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M27 2L9 27h11l-3 19 21-26H26l1-18z"/>
+  </symbol>
+  <symbol id="i-rings" viewBox="0 0 48 48">
+    <g fill="none" stroke="currentColor" stroke-width="3.2">
+      <circle cx="18" cy="24" r="12"/>
+      <circle cx="30" cy="24" r="12"/>
+    </g>
+  </symbol>
+  <symbol id="i-grid" viewBox="0 0 48 48">
+    <g fill="currentColor">
+      <rect x="4" y="4" width="16" height="16" rx="4"/>
+      <rect x="28" y="4" width="16" height="16" rx="8"/>
+      <rect x="4" y="28" width="16" height="16" rx="8"/>
+      <rect x="28" y="28" width="16" height="16" rx="4"/>
+    </g>
+  </symbol>
+</svg>
+
+<section class="marquee-section" aria-label="Integrations">
+  <div class="rows">
+    <div class="marquee row-1"><div class="track" data-row="1" style="--dur:52s"></div></div>
+    <div class="marquee row-2"><div class="track reverse" data-row="2" style="--dur:60s"></div></div>
+    <div class="marquee row-3"><div class="track" data-row="3" style="--dur:56s"></div></div>
+  </div>
+</section>
+
+<script>
+  const rows = {
+    1: [
+      ["Zapier","i-star8"],["Make","i-star8"],["Custom APIs","i-grid"],["HubSpot","i-sun"],
+      ["Salesforce","i-s"],["Zoho","i-diamond"],["Airtable","i-rings"],["Notion","i-cube"]
+    ],
+    2: [
+      ["Customer.io","i-blob"],["Pipedrive","i-cube"],["Attio","i-bolt"],["Copper","i-hexblob"],
+      ["Close","i-layers"],["Folk","i-quad"],["Intercom","i-rings"],["Segment","i-flower"]
+    ],
+    3: [
+      ["LiveChat","i-waves"],["Pabbly","i-quad"],["Workato","i-spiral"],["Anthropic","i-n"],
+      ["Vertex","i-flower"],["Azure AI","i-bolt"],["OpenAI","i-star8"],["Mistral","i-grid"]
+    ]
+  };
+
+  function pill(label, icon){
+    return `<div class="pill">
+      <span class="label">${label}</span>
+      <span class="icon" aria-hidden="true"><svg><use href="#${icon}"></use></svg></span>
+    </div>`;
+  }
+
+  document.querySelectorAll('.track').forEach(track => {
+    const items = rows[track.dataset.row];
+    // repeat set enough times to comfortably fill wide screens, then duplicate for the loop
+    let set = '';
+    const reps = 2;
+    for (let r = 0; r < reps; r++) set += items.map(i => pill(i[0], i[1])).join('');
+    track.innerHTML = set + set; // second half = seamless -50% loop
+  });
+</script>
+</body>
+</html>
